@@ -18,14 +18,27 @@ app.set('view engine', 'ejs')
 
 function logs(req, res, next) {
    console.log(`Alguien realizo un request a: ${req.originalUrl}`);
-   console.log(req.headers)
    next();
 }
+
+function token(req, res, next){
+    console.log(req.header('Authorization'))
+    if (req.header('Authorization') == 'TOKENVALIDO') {
+        next()
+    }else{
+        return res
+        .status(401)
+        .send("Tu petición no tiene cabecera de autorización");
+    }
+}
+
 
 app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(logs)
+app.use(token)
+
 
 /////////////////////////// ROUTES ///////////////////////////
 
@@ -68,7 +81,6 @@ app.get('/test/query', function (req, res) {
  
     res.send('<h1>' + saludo + '</h1>');
     
- 
 });
 
 app.post('/test/body', function (req, res) {
@@ -78,7 +90,6 @@ app.post('/test/body', function (req, res) {
     let saludo = "Hola " + name + " " + surname;
  
     res.send('<h1>'+ saludo +' </h1>');
-    console.log(req.header('Authorization'))
  
 });
 
